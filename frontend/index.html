@@ -1,13 +1,117 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <title>MLP Flow Classifier — Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    body { font-family: Arial, sans-serif; margin: 30px; }
-    .card { max-width: 800px; margin: auto; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-    input, button { padding: 8px; margin: 8px 0; }
-    pre { background:#f5f5f5; padding: 10px; }
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: #f7f9fb;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+
+    .card {
+      background: #fff;
+      width: 90%;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      transition: 0.3s ease;
+    }
+
+    .card:hover {
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+    }
+
+    h2 {
+      text-align: center;
+      color: #222;
+      margin-bottom: 20px;
+    }
+
+    p {
+      color: #555;
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    input[type="file"],
+    textarea {
+      width: 100%;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 15px;
+      box-sizing: border-box;
+      margin-top: 10px;
+      margin-bottom: 20px;
+      transition: border-color 0.3s;
+    }
+
+    input[type="file"]:focus,
+    textarea:focus {
+      border-color: #0078d7;
+      outline: none;
+    }
+
+    button {
+      display: inline-block;
+      background-color: #0078d7;
+      color: #fff;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 15px;
+      cursor: pointer;
+      margin: 5px;
+      transition: background-color 0.3s, transform 0.2s;
+    }
+
+    button:hover {
+      background-color: #005fa3;
+      transform: translateY(-1px);
+    }
+
+    h3 {
+      margin-top: 25px;
+      color: #333;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 5px;
+    }
+
+    pre {
+      background: #f5f5f5;
+      padding: 12px;
+      border-radius: 8px;
+      color: #222;
+      overflow-x: auto;
+    }
+
+    #status {
+      margin-top: 10px;
+      text-align: center;
+      color: #0078d7;
+      font-weight: 500;
+      display: none;
+    }
+
+    @media (max-width: 600px) {
+      .card {
+        padding: 20px;
+      }
+
+      textarea {
+        font-size: 14px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -15,21 +119,52 @@
     <h2>MLP Flow Classifier — Demo</h2>
 
     <p>
-      Upload a CSV file containing flow features (one or more rows). The CSV columns must include the features used for training.
+      Upload a CSV file containing flow features (one or more rows). The CSV columns must include
+      the same features used during model training.
     </p>
 
     <input type="file" id="csvFile" accept=".csv" />
-    <br/>
-    <button id="uploadBtn">Upload CSV & Predict</button>
+    <br />
+    <button id="uploadBtn">📂 Upload CSV & Predict</button>
+
     <h3>Or paste a single sample JSON feature object:</h3>
-    <textarea id="jsonInput" rows="8" cols="80" placeholder='{"src_port":67, "dst_port":68, "pktTotalCount":10, ...}'></textarea>
-    <br/>
-    <button id="jsonBtn">Predict JSON</button>
+    <textarea
+      id="jsonInput"
+      rows="8"
+      cols="80"
+      placeholder='{"src_port":67, "dst_port":68, "pktTotalCount":10, ...}'
+    ></textarea>
+    <br />
+    <button id="jsonBtn">⚙️ Predict JSON</button>
+
+    <div id="status">Processing your request...</div>
 
     <h3>Result</h3>
     <pre id="result">No prediction yet.</pre>
   </div>
 
   <script src="app.js"></script>
+  <script>
+    // Optional: small UX improvement (show loading status)
+    const status = document.getElementById("status");
+    const uploadBtn = document.getElementById("uploadBtn");
+    const jsonBtn = document.getElementById("jsonBtn");
+
+    function showStatus(message) {
+      status.textContent = message;
+      status.style.display = "block";
+    }
+
+    function hideStatus() {
+      status.style.display = "none";
+    }
+
+    uploadBtn.addEventListener("click", () => showStatus("Uploading CSV..."));
+    jsonBtn.addEventListener("click", () => showStatus("Processing JSON input..."));
+
+    // Automatically hide status when result updates
+    const resultObserver = new MutationObserver(hideStatus);
+    resultObserver.observe(document.getElementById("result"), { childList: true });
+  </script>
 </body>
 </html>
